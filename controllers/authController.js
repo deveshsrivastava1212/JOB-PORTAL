@@ -37,17 +37,15 @@ export const loginController = async (req, res, next) => {
     const user = await userSchema.findOne({ email }).select("+password");
     if (!user) next("User Not Found...")
     const isMatch = await user.comparePassword(password)
-    if (isMatch) {
-        user.password = undefined;
-        const token = user.createJWT()
-        res.status(200).send({
-            success: true,
-            message: "User Login Successful",
-            user,
-            token
-        })
-    } else {
+    if (!isMatch) {
         next("Invalid User or Password")
     }
-
+    user.password = undefined;
+    const token = user.createJWT()
+    res.status(200).send({
+        success: true,
+        message: "User Login Successful",
+        user,
+        token
+    })
 }
